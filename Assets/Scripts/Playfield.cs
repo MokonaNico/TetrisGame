@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public class Playfield : MonoBehaviour
 {
-    private static int w = 10, h = 23;
+    private static int w = 10, h = 24;
     private Square[,] grid = new Square[h, w];
     public Square prefab;
     private Tetros currentTetros;
@@ -156,8 +156,6 @@ public class Playfield : MonoBehaviour
         {
             grid[line, i].spriteRenderer.enabled = false;
         }
-
-        Debug.Log(line);
         
         for (int y = line + 1; y < h; y++)
         {
