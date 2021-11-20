@@ -11,6 +11,11 @@ public class Playfield : MonoBehaviour
     public Square prefab;
     private Tetros currentTetros;
 
+    private void Awake()
+    {
+        InitPlayField();
+    }
+
     private void InitPlayField()
     {
         for (int y = 0; y < h; y++)
@@ -25,12 +30,7 @@ public class Playfield : MonoBehaviour
             }
         }
     }
-
-    private void Awake()
-    {
-        InitPlayField();
-    }
-
+    
     public void SpawnNewTetros()
     {
         int r = Random.Range(0, 7);
