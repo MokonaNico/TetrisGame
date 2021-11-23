@@ -2,19 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameHandler : MonoBehaviour
+public class InputHandler : MonoBehaviour
 {
     public Playfield Playfield;
-    public float G;
     private float nextDown;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        StartCoroutine(ApplyGravityToTetros());
-        Playfield.SpawnNewTetros();
-    }
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -40,15 +32,6 @@ public class GameHandler : MonoBehaviour
         {
             nextDown = Time.time + 0.1f;
             Playfield.ApplyGravity();
-        }
-    }
-
-    IEnumerator  ApplyGravityToTetros()
-    {
-        while (true)
-        {
-            Playfield.ApplyGravity();
-            yield return new WaitForSeconds( 1/G );
         }
     }
 }

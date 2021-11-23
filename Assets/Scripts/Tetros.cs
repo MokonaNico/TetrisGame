@@ -34,6 +34,19 @@ public abstract class Tetros
         }
         
     }
+
+    public static List<Tetros> GetListOfAllTetros()
+    {
+        List<Tetros> tetrosList = new List<Tetros>();
+        tetrosList.Add(new IShape());
+        tetrosList.Add(new JShape());
+        tetrosList.Add(new LShape());
+        tetrosList.Add(new OShape());
+        tetrosList.Add(new SShape());
+        tetrosList.Add(new TShape());
+        tetrosList.Add(new ZShape());
+        return tetrosList;
+    }
     
 }
 
@@ -292,6 +305,6 @@ public class LShape : Tetros
     
     public override Color GetColor()
     {
-        return new Color(255,150,0);
+        return new Color(1,0.5f,0);
     }
 }
