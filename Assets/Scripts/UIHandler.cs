@@ -4,13 +4,18 @@ using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
-public class ScoreHandler : MonoBehaviour
+public class UIHandler : MonoBehaviour
 {
     public Text text;
+    public Text gameOver;
 
     public void UpdateScore(int score)
     {
-        score = score * 1000;
         text.text = ""+score;
+    }
+
+    public void ShowGameOver(bool show)
+    {
+        gameOver.enabled = show;
     }
 }

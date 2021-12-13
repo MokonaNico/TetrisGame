@@ -7,16 +7,46 @@ public class InputHandler : MonoBehaviour
     public Playfield Playfield;
     private float nextDown;
     
-    // Update is called once per frame
+    private bool isPushingLeft, isPushingRight;
+    private double leftTimer, rightTimer;
+
+    public double MovingPauseTime = 0.5;
+    public double movingRate = 0.2;
+    
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Playfield.MoveTetros(new Vector2Int(-1,0));    
+            Playfield.MoveTetros(new Vector2Int(-1,0));
+            isPushingLeft = true;
+            leftTimer = Time.time + MovingPauseTime;
         } 
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Playfield.MoveTetros(new Vector2Int(1,0)); 
+            Playfield.MoveTetros(new Vector2Int(1,0));
+            isPushingRight = true;
+            rightTimer = Time.time + MovingPauseTime;
+        }
+
+        if (isPushingLeft && Time.time > leftTimer)
+        {
+            Playfield.MoveTetros(new Vector2Int(-1,0));
+            leftTimer = Time.time + movingRate;
+        }
+        
+        if (isPushingRight && Time.time > rightTimer)
+        {
+            Playfield.MoveTetros(new Vector2Int(1,0));
+            rightTimer = Time.time + movingRate;
+        }
+        
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            isPushingLeft = false;
+        } 
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            isPushingRight = false;
         }
 
         if (Input.GetKeyDown(KeyCode.W))

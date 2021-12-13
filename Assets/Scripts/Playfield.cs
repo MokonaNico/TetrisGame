@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = System.Random;
 
 public class Playfield : MonoBehaviour
@@ -13,16 +14,25 @@ public class Playfield : MonoBehaviour
     private Tetros nextTetros;
     private List<Tetros> nextTetrosList = new List<Tetros>();
     private int score = 0;
-    public float G;
+    public float G = 1;
     private static Random random = new Random();
+    private bool gameIsOn = true;
 
-    public ScoreHandler _scoreHandler;
+    public UIHandler uiHandler;
     public NextTetrosHandler _NextTetrosHandler;
+    public BestScoreHandler BestScoreHandler;
+
+    private IEnumerator gravityCoroutine;
+    
 
     void Start()
     {
-        StartCoroutine(ApplyGravityToTetros());
+        gameIsOn = true;
+        gravityCoroutine = ApplyGravityToTetros();
+        StartCoroutine(gravityCoroutine);
+        StartCoroutine(IncreaseDifficulty());
         SpawnNewTetros();
+        uiHandler.ShowGameOver(false);
     }
     
     IEnumerator ApplyGravityToTetros()
@@ -31,6 +41,17 @@ public class Playfield : MonoBehaviour
         {
             ApplyGravity();
             yield return new WaitForSeconds( 1/G );
+        }
+    }
+    
+    
+    private IEnumerator IncreaseDifficulty()
+    {
+        G -= 1f;
+        while (true)
+        {
+            G += 1f;
+            yield return new WaitForSeconds( 60 );
         }
     }
     
@@ -60,9 +81,22 @@ public class Playfield : MonoBehaviour
         currentTetros = nextTetros;
         nextTetros = GetNextTetrosToSpawn();
         _NextTetrosHandler.UpdateNextTetros(nextTetros);
-
-        currentTetros.pos = new Vector2Int(4,21);
-        SetAllBlocksOfTetros(true);
+        
+        Vector2Int spawnPosition = new Vector2Int(4,21);
+        currentTetros.pos = spawnPosition;
+        if (IsTouchingStaticBlock())
+        {
+            StopCoroutine(gravityCoroutine);
+            gameIsOn = false;
+            uiHandler.ShowGameOver(true);
+            BestScoreHandler.AddNewScore(score);
+            BestScoreHandler.UpdateScore();
+        }
+        else
+        {
+            SetAllBlocksOfTetros(true);
+        }
+        
     }
     
     private Tetros GetNextTetrosToSpawn()
@@ -84,7 +118,7 @@ public class Playfield : MonoBehaviour
     
     public void MoveTetros(Vector2Int dir)
     {
-        if(currentTetros == null) return;
+        if(currentTetros == null || !gameIsOn) return;
 
         SetAllBlocksOfTetros(false);
         currentTetros.pos += dir;
@@ -95,7 +129,7 @@ public class Playfield : MonoBehaviour
 
     public void ApplyGravity()
     {
-        if(currentTetros == null) return;
+        if(currentTetros == null || !gameIsOn) return;
         
         SetAllBlocksOfTetros(false);
         currentTetros.pos += new Vector2Int(0,-1);
@@ -103,7 +137,25 @@ public class Playfield : MonoBehaviour
         {
             currentTetros.pos -= new Vector2Int(0,-1);
             SetAllBlocksOfTetros(true);
-            CheckLine();
+            int nbrLine = CheckLine();
+            switch (nbrLine)
+            {
+                case 1:
+                    score += 100;
+                    break; 
+                case 2:
+                    score += 300;
+                    break;
+                case 3:
+                    score += 500;
+                    break;
+                case 4:
+                    score += 800;
+                    break;
+            }
+            uiHandler.UpdateScore(score);
+            
+            
             SpawnNewTetros();
             return;
         }
@@ -161,7 +213,8 @@ public class Playfield : MonoBehaviour
         SetAllBlocksOfTetros(true);
     }
 
-    public void CheckLine()
+
+    public int CheckLine()
     {
         int line = -1;
         
@@ -182,11 +235,9 @@ public class Playfield : MonoBehaviour
             }
         }
 
-        if(line == -1) return; // If there is no line to remove, just return
+        if(line == -1) return 0; // If there is no line to remove, just return
         
         // Remove the line
-        score++;
-        _scoreHandler.UpdateScore(score);
         for (int i = 0; i < w; i++)
         {
             grid[line, i].spriteRenderer.enabled = false;
@@ -202,6 +253,6 @@ public class Playfield : MonoBehaviour
             }
         }
         
-        CheckLine();
+        return 1 + CheckLine();
     }
 }
